@@ -3,9 +3,12 @@ import { z } from "zod";
 
 import {
   type AssessmentReport,
+  type MultipleChoiceQuestionId,
+  multipleChoiceQuestionIds,
   questionIds,
   questions,
   reportAspectTitles,
+  writtenQuestionIds,
 } from "@/lib/assessment";
 import { ASPECT_CROSSWALK, SCORING_INSTRUCTIONS } from "@/lib/scoring-rubric";
 
@@ -33,8 +36,8 @@ const requestSchema = z
     }
   });
 
-const itemResultSchema = z.object({
-  questionId: z.enum(questionIds),
+const writtenItemResultSchema = z.object({
+  questionId: z.enum(writtenQuestionIds),
   status: z.enum(["rated", "not_rated"]),
   score: z.number().int().min(0).max(4).nullable(),
   feedback: z.string().min(1).max(600),
@@ -47,7 +50,7 @@ const evidenceSchema = z.object({
 });
 
 const modelOutputSchema = z.object({
-  itemResults: z.array(itemResultSchema).length(16),
+  writtenItemResults: z.array(writtenItemResultSchema).length(6),
   previewObservations: z.array(z.string().min(1).max(500)).min(1).max(2),
   aspects: z
     .array(
@@ -69,14 +72,14 @@ const modelOutputSchema = z.object({
 const structuredOutputSchema = {
   type: "object",
   properties: {
-    itemResults: {
+    writtenItemResults: {
       type: "array",
-      minItems: 16,
-      maxItems: 16,
+      minItems: 6,
+      maxItems: 6,
       items: {
         type: "object",
         properties: {
-          questionId: { type: "string", enum: questionIds },
+          questionId: { type: "string", enum: writtenQuestionIds },
           status: { type: "string", enum: ["rated", "not_rated"] },
           score: { anyOf: [{ type: "integer", minimum: 0, maximum: 4 }, { type: "null" }] },
           feedback: { type: "string" },
@@ -135,7 +138,7 @@ const structuredOutputSchema = {
     confidenceReason: { type: "string" },
   },
   required: [
-    "itemResults",
+    "writtenItemResults",
     "previewObservations",
     "aspects",
     "demonstratedStrengths",
@@ -145,6 +148,19 @@ const structuredOutputSchema = {
   ],
   additionalProperties: false,
 } as const;
+
+const MCQ_ANSWER_KEYS = {
+  Q01: "C",
+  Q03: "B",
+  Q05: "B",
+  Q07: "B",
+  Q09: "B",
+  Q11: "B",
+  Q13: "C",
+  Q14: "B",
+  Q15: "C",
+  Q16: "C",
+} as const satisfies Record<MultipleChoiceQuestionId, string>;
 
 type OpenAIResponse = {
   output?: Array<{
@@ -174,19 +190,19 @@ function normalizeExcerpt(value: string) {
 
 function validateModelOutput(value: unknown) {
   const parsed = modelOutputSchema.parse(value);
-  const seenQuestions = new Set(parsed.itemResults.map((item) => item.questionId));
+  const seenQuestions = new Set(parsed.writtenItemResults.map((item) => item.questionId));
   const seenAspects = new Set(parsed.aspects.map((aspect) => aspect.title));
 
   if (
-    seenQuestions.size !== questionIds.length ||
-    questionIds.some((id) => !seenQuestions.has(id)) ||
+    seenQuestions.size !== writtenQuestionIds.length ||
+    writtenQuestionIds.some((id) => !seenQuestions.has(id)) ||
     seenAspects.size !== reportAspectTitles.length ||
     reportAspectTitles.some((title) => !seenAspects.has(title))
   ) {
     throw new Error("The scoring response did not cover the complete assessment.");
   }
 
-  for (const item of parsed.itemResults) {
+  for (const item of parsed.writtenItemResults) {
     if ((item.status === "not_rated") !== (item.score === null)) {
       throw new Error("The scoring response used an inconsistent item status.");
     }
@@ -217,6 +233,9 @@ export async function POST(request: Request) {
       );
     }
 
+    const answerByQuestion = new Map(
+      payload.data.answers.map((answer) => [answer.questionId, answer]),
+    );
     const scoringRecord = payload.data.answers.map((answer) => {
       const question = questions.find((item) => item.id === answer.questionId)!;
       const selected = question.choices?.find((choice) => choice.label === answer.choice);
@@ -226,7 +245,8 @@ export async function POST(request: Request) {
         responseType: question.responseType,
         question: question.stem,
         selectedChoice: selected ? `${selected.label}. ${selected.text}` : null,
-        explanation: answer.explanation.trim(),
+        explanation:
+          question.responseType === "multiple-choice" ? "" : answer.explanation.trim(),
       };
     });
 
@@ -242,7 +262,8 @@ export async function POST(request: Request) {
         max_output_tokens: 9_000,
         instructions: `${SCORING_INSTRUCTIONS}\n\nReturn only the requested structured evaluation. Preserve the item and aspect order. Public feedback must be concise, specific, and suitable for the test taker; do not reveal answer keys or evaluator-only notes.`,
         input: JSON.stringify({
-          purpose: "Score this completed assessment using the fixed evaluator rubric.",
+          purpose:
+            "Score the six written-reasoning items and produce response-grounded qualitative feedback using the fixed evaluator rubric.",
           responses: scoringRecord,
         }),
         text: {
@@ -273,14 +294,23 @@ export async function POST(request: Request) {
     if (!outputText) throw new Error("The evaluator returned no structured report.");
 
     const evaluated = validateModelOutput(JSON.parse(outputText));
-    const skippedItems = new Set(
-      payload.data.answers
-        .filter((answer) => !answer.choice && !answer.explanation.trim())
-        .map((answer) => answer.questionId),
+    const answeredMcqIds = multipleChoiceQuestionIds.filter((id) => {
+      const answer = answerByQuestion.get(id)!;
+      const question = questions.find((item) => item.id === id)!;
+      return question.choices?.some((choice) => choice.label === answer.choice);
+    });
+    const mcqScore = answeredMcqIds.filter(
+      (id) => answerByQuestion.get(id)!.choice === MCQ_ANSWER_KEYS[id],
+    ).length;
+    const submittedWrittenIds = new Set(
+      writtenQuestionIds.filter((id) => {
+        const record = scoringRecord.find((item) => item.questionId === id)!;
+        return Boolean(record.selectedChoice || record.explanation);
+      }),
     );
-    const itemResults = questionIds.map((id) => {
-      const item = evaluated.itemResults.find((result) => result.questionId === id)!;
-      return skippedItems.has(id)
+    const writtenItemResults = writtenQuestionIds.map((id) => {
+      const item = evaluated.writtenItemResults.find((result) => result.questionId === id)!;
+      return !submittedWrittenIds.has(id)
         ? {
             questionId: id,
             status: "not_rated" as const,
@@ -289,25 +319,30 @@ export async function POST(request: Request) {
           }
         : item;
     });
-    const rated = itemResults.filter(
+    const ratedWrittenItems = writtenItemResults.filter(
       (item): item is typeof item & { score: number } => item.status === "rated" && item.score !== null,
     );
-    const totalScore = rated.reduce((sum, item) => sum + item.score, 0);
+    const writtenScore = ratedWrittenItems.reduce((sum, item) => sum + item.score, 0);
     const responseText = new Map(
       scoringRecord.map((record) => [
         record.questionId,
         normalizeExcerpt(`${record.selectedChoice ?? ""} ${record.explanation}`),
       ]),
     );
+    const observableQuestions = new Set<string>(answeredMcqIds);
+    for (const item of ratedWrittenItems) observableQuestions.add(item.questionId);
 
     const aspects = reportAspectTitles.map((title) => {
       const modelAspect = evaluated.aspects.find((aspect) => aspect.title === title)!;
       const crosswalk = [...ASPECT_CROSSWALK[title]];
-      const ratedInAspect = itemResults.some(
-        (item) => crosswalk.includes(item.questionId) && item.status === "rated",
+      const ratedInAspect = crosswalk.some((questionId) =>
+        observableQuestions.has(questionId),
       );
       const evidence = modelAspect.evidence
-        .filter((item) => crosswalk.includes(item.questionId))
+        .filter(
+          (item) =>
+            crosswalk.includes(item.questionId) && observableQuestions.has(item.questionId),
+        )
         .map((item) => {
           const normalized = normalizeExcerpt(item.excerpt);
           const excerptIsGrounded =
@@ -337,10 +372,19 @@ export async function POST(request: Request) {
     });
 
     const report: AssessmentReport = {
-      itemResults,
-      totalScore,
-      ratedItems: rated.length,
-      maximumScore: rated.length * 4,
+      mcqAccuracy: {
+        score: mcqScore,
+        ratedItems: answeredMcqIds.length,
+        maximumScore: answeredMcqIds.length,
+        totalItems: multipleChoiceQuestionIds.length,
+      },
+      writtenReasoning: {
+        score: writtenScore,
+        ratedItems: ratedWrittenItems.length,
+        maximumScore: ratedWrittenItems.length * 4,
+        totalItems: writtenQuestionIds.length,
+      },
+      writtenItemResults,
       previewObservations: evaluated.previewObservations,
       aspects,
       demonstratedStrengths: evaluated.demonstratedStrengths,

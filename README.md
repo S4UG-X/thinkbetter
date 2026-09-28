@@ -9,8 +9,9 @@ separately from assessment content.
 
 - `DB` is the existing D1 binding used for report-access email records and basic
   funnel events.
-- `OPENAI_API_KEY` is required for rubric-based scoring. Keep it server-side and
-  configure it as a Site secret.
+- `OPENAI_API_KEY` is required for the qualitative report and rubric-based
+  written-reasoning scoring. Multiple-choice accuracy is calculated server-side.
+  Keep the key server-side and configure it as a Site secret.
 - `OPENAI_SCORING_MODEL` is optional and defaults to `gpt-6-astra`.
 
 When the scoring key is absent or the evaluator fails, the UI preserves the

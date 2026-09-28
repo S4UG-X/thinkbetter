@@ -29,7 +29,6 @@ import {
   type AssessmentAnswer,
   type AssessmentReport,
   type QuestionId,
-  MULTIPLE_CHOICE_INSTRUCTION,
   emptyAnswers,
   questionIds,
   questions,
@@ -310,13 +309,15 @@ function Assessment({
   const question = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const isFinal = currentIndex === questions.length - 1;
-  const hasChoices = Boolean(question.choices?.length);
-  const isBlank = !answer.choice && !answer.explanation.trim();
-  const incompleteMessage = isBlank
-    ? "This question has no answer. If you continue, it will be marked not rated rather than incorrect."
-    : !answer.choice && hasChoices
-      ? "No option is selected. You can continue, but the evaluator may not be able to rate this item."
-      : "Your explanation is blank. You can continue; a bare multiple-choice answer is scored using the rubric, with its rationale recorded as not observed.";
+  const requiresExplanation = question.responseType !== "multiple-choice";
+  const incompleteMessage =
+    question.responseType === "multiple-choice"
+      ? "No option is selected. If you continue, this question will be marked not rated rather than incorrect."
+      : !answer.choice && !answer.explanation.trim()
+        ? "This question has no answer. If you continue, it will be marked not rated rather than incorrect."
+        : !answer.choice && question.responseType === "choice-and-explanation"
+          ? "No option is selected. You can continue, but the written-reasoning score will reflect only the explanation you submitted."
+          : "Your written reasoning is blank. You can continue, but the score for this item will reflect only the option you selected.";
 
   return (
     <main id="main-content" className="min-h-screen bg-paper">
@@ -361,8 +362,14 @@ function Assessment({
               <RadioGroup
                 className="mt-3 gap-3"
                 value={answer.choice ?? ""}
-                onValueChange={(choice) => onAnswer({ ...answer, choice })}
-                aria-describedby={`${question.id}-choice-help`}
+                onValueChange={(choice) =>
+                  onAnswer({
+                    choice,
+                    explanation:
+                      question.responseType === "multiple-choice" ? "" : answer.explanation,
+                  })
+                }
+                aria-describedby={`${question.id}-choice-help${confirmIncomplete && !answer.choice ? ` ${question.id}-incomplete` : ""}`}
               >
                 {question.choices.map((choice) => {
                   const selected = answer.choice === choice.label;
@@ -395,30 +402,30 @@ function Assessment({
             </fieldset>
           )}
 
-          <section className="mt-9" aria-labelledby={`${question.id}-reasoning-label`}>
-            <Label
-              id={`${question.id}-reasoning-label`}
-              htmlFor={`${question.id}-explanation`}
-              className="block font-serif text-2xl leading-8 text-ink"
-            >
-              {hasChoices ? "Why?" : "Your reasoning"}
-            </Label>
-            <p id={`${question.id}-reasoning-help`} className="mt-2 leading-7 text-ink-muted">
-              {question.responseType === "multiple-choice"
-                ? MULTIPLE_CHOICE_INSTRUCTION
-                : question.responseType === "choice-and-explanation"
+          {requiresExplanation && (
+            <section className="mt-9" aria-labelledby={`${question.id}-reasoning-label`}>
+              <Label
+                id={`${question.id}-reasoning-label`}
+                htmlFor={`${question.id}-explanation`}
+                className="block font-serif text-2xl leading-8 text-ink"
+              >
+                Your reasoning
+              </Label>
+              <p id={`${question.id}-reasoning-help`} className="mt-2 leading-7 text-ink-muted">
+                {question.responseType === "choice-and-explanation"
                   ? "Explain your reasoning."
-                  : "Explain your reasoning. Use ordinary language and focus on how you reached your conclusion."}
-            </p>
-            <Textarea
-              id={`${question.id}-explanation`}
-              value={answer.explanation}
-              onChange={(event) => onAnswer({ ...answer, explanation: event.target.value })}
-              aria-describedby={`${question.id}-reasoning-help${confirmIncomplete ? ` ${question.id}-incomplete` : ""}`}
-              placeholder="Write what you think and explain why..."
-              className="mt-4 min-h-44 resize-y rounded-[4px] border-ink/30 bg-sheet p-4 text-base leading-7 text-ink shadow-none focus-visible:border-accent focus-visible:ring-accent/25 md:text-base"
-            />
-          </section>
+                  : "Use ordinary language and focus on how you reached your conclusion."}
+              </p>
+              <Textarea
+                id={`${question.id}-explanation`}
+                value={answer.explanation}
+                onChange={(event) => onAnswer({ ...answer, explanation: event.target.value })}
+                aria-describedby={`${question.id}-reasoning-help${confirmIncomplete ? ` ${question.id}-incomplete` : ""}`}
+                placeholder="Write your reasoning..."
+                className="mt-4 min-h-44 resize-y rounded-[4px] border-ink/30 bg-sheet p-4 text-base leading-7 text-ink shadow-none focus-visible:border-accent focus-visible:ring-accent/25 md:text-base"
+              />
+            </section>
+          )}
 
           <div className="mt-5 min-h-20">
             {confirmIncomplete && (
@@ -510,11 +517,11 @@ function ScoringScreen({
                 <span className="text-sm font-semibold uppercase">Calculating your report</span>
               </div>
               <h1 className="mt-5 font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl">
-                Reading your responses against the rubric
+                Checking your answers and reading your written responses
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-ink-muted">
-                This is real scoring work. Your answers are being evaluated item by item;
-                there is no artificial waiting period.
+                Multiple-choice accuracy is being checked while your written reasoning is
+                evaluated against the rubric. There is no artificial waiting period.
               </p>
             </>
           ) : (
@@ -705,7 +712,7 @@ function ReportPreview({
           <div>
             <p className="annotation-label">Full report access</p>
             <h2 className="mt-4 font-serif text-3xl font-semibold text-ink sm:text-4xl">
-              See the item-based result and five feedback areas
+              See MCQ accuracy, written reasoning, and five feedback areas
             </h2>
             <p className="mt-4 leading-7 text-ink-muted">
               The full report cites your responses, identifies demonstrated strengths,
@@ -737,7 +744,8 @@ function ReportPreview({
 }
 
 function FullReport({ report, onRestart }: { report: AssessmentReport; onRestart: () => void }) {
-  const complete = report.ratedItems === questions.length;
+  const mcqNotRated = report.mcqAccuracy.totalItems - report.mcqAccuracy.ratedItems;
+  const writtenNotRated = report.writtenReasoning.totalItems - report.writtenReasoning.ratedItems;
 
   return (
     <main id="main-content" className="min-h-screen">
@@ -757,30 +765,61 @@ function FullReport({ report, onRestart }: { report: AssessmentReport; onRestart
             </AlertDescription>
           </Alert>
 
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
             <div>
               <p className="annotation-label">Full assessment report</p>
               <h1 className="mt-4 font-serif text-5xl font-semibold leading-tight text-ink sm:text-6xl">
                 What these responses demonstrate
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-8 text-ink-muted">
-                This is an item-based result for this question set, not a pass/fail
+                These results describe performance on this question set, not a pass/fail
                 judgment or a definitive measure of general ability.
               </p>
             </div>
-            <div className="border-l-2 border-accent pl-5">
-              <p className="text-sm font-semibold uppercase text-accent">Item-based result</p>
-              {report.ratedItems > 0 ? (
-                <p className="mt-2 font-serif text-5xl font-semibold text-ink">
-                  {report.totalScore}<span className="text-2xl text-ink-muted"> / {report.maximumScore}</span>
+
+            <div className="mt-9 grid gap-px border border-ink/15 bg-ink/15 sm:grid-cols-2">
+              <section className="bg-paper p-5 sm:p-6" aria-labelledby="mcq-result-title">
+                <p id="mcq-result-title" className="text-sm font-semibold uppercase text-accent">
+                  MCQ accuracy
                 </p>
-              ) : (
-                <p className="mt-2 font-serif text-3xl font-semibold text-ink">No items rated</p>
-              )}
-              <p className="mt-2 text-sm leading-6 text-ink-muted">
-                {complete ? "All 16 items rated; maximum 64." : `${report.ratedItems} of 16 items rated. Unrated items were not counted as zero.`}
-              </p>
+                {report.mcqAccuracy.ratedItems > 0 ? (
+                  <p className="mt-2 font-serif text-5xl font-semibold text-ink">
+                    {report.mcqAccuracy.score}
+                    <span className="text-2xl text-ink-muted"> / {report.mcqAccuracy.maximumScore}</span>
+                  </p>
+                ) : (
+                  <p className="mt-2 font-serif text-3xl font-semibold text-ink">No questions answered</p>
+                )}
+                <p className="mt-2 text-sm leading-6 text-ink-muted">
+                  {mcqNotRated === 0
+                    ? `${report.mcqAccuracy.ratedItems} of ${report.mcqAccuracy.totalItems} answered.`
+                    : `${report.mcqAccuracy.ratedItems} of ${report.mcqAccuracy.totalItems} answered; ${mcqNotRated} not rated.`}
+                </p>
+              </section>
+
+              <section className="bg-paper p-5 sm:p-6" aria-labelledby="written-result-title">
+                <p id="written-result-title" className="text-sm font-semibold uppercase text-accent">
+                  Written reasoning
+                </p>
+                {report.writtenReasoning.ratedItems > 0 ? (
+                  <p className="mt-2 font-serif text-5xl font-semibold text-ink">
+                    {report.writtenReasoning.score}
+                    <span className="text-2xl text-ink-muted"> / {report.writtenReasoning.maximumScore}</span>
+                  </p>
+                ) : (
+                  <p className="mt-2 font-serif text-3xl font-semibold text-ink">No items rated</p>
+                )}
+                <p className="mt-2 text-sm leading-6 text-ink-muted">
+                  {writtenNotRated === 0
+                    ? `${report.writtenReasoning.ratedItems} of ${report.writtenReasoning.totalItems} rated; maximum 24.`
+                    : `${report.writtenReasoning.ratedItems} of ${report.writtenReasoning.totalItems} rated; ${writtenNotRated} not rated.`}
+                </p>
+              </section>
             </div>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-ink-muted">
+              These two results are reported separately and are not combined. Unrated items
+              are not counted as incorrect or as zero.
+            </p>
           </div>
         </div>
       </section>
@@ -1042,8 +1081,11 @@ export function AssessmentExperience() {
     const question = questions[currentIndex];
     const answer = answers[question.id];
     const incomplete =
-      (!answer.choice && !answer.explanation.trim()) ||
-      (Boolean(question.choices?.length) && (!answer.choice || !answer.explanation.trim()));
+      question.responseType === "multiple-choice"
+        ? !answer.choice
+        : question.responseType === "choice-and-explanation"
+          ? !answer.choice || !answer.explanation.trim()
+          : !answer.explanation.trim();
 
     if (incomplete && !force) {
       setConfirmIncomplete(true);

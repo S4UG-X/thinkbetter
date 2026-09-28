@@ -1,6 +1,3 @@
-export const MULTIPLE_CHOICE_INSTRUCTION =
-  "Choose the best answer and briefly explain why it is best. If useful, mention why one plausible alternative is weaker.";
-
 export type QuestionId =
   | "Q01"
   | "Q02"
@@ -307,6 +304,31 @@ export const questionIds = [
   "Q16",
 ] as const satisfies readonly QuestionId[];
 
+export const multipleChoiceQuestionIds = [
+  "Q01",
+  "Q03",
+  "Q05",
+  "Q07",
+  "Q09",
+  "Q11",
+  "Q13",
+  "Q14",
+  "Q15",
+  "Q16",
+] as const satisfies readonly QuestionId[];
+
+export const writtenQuestionIds = [
+  "Q02",
+  "Q04",
+  "Q06",
+  "Q08",
+  "Q10",
+  "Q12",
+] as const satisfies readonly QuestionId[];
+
+export type MultipleChoiceQuestionId = (typeof multipleChoiceQuestionIds)[number];
+export type WrittenQuestionId = (typeof writtenQuestionIds)[number];
+
 export const reportAspectTitles = [
   "Identifying assumptions",
   "Evaluating evidence",
@@ -317,11 +339,18 @@ export const reportAspectTitles = [
 
 export type ReportAspectTitle = (typeof reportAspectTitles)[number];
 
-export type ItemResult = {
-  questionId: QuestionId;
+export type WrittenItemResult = {
+  questionId: WrittenQuestionId;
   status: "rated" | "not_rated";
   score: number | null;
   feedback: string;
+};
+
+export type ResultSummary = {
+  score: number;
+  ratedItems: number;
+  maximumScore: number;
+  totalItems: number;
 };
 
 export type ReportEvidence = {
@@ -341,10 +370,9 @@ export type ReportAspect = {
 };
 
 export type AssessmentReport = {
-  itemResults: ItemResult[];
-  totalScore: number;
-  ratedItems: number;
-  maximumScore: number;
+  mcqAccuracy: ResultSummary;
+  writtenReasoning: ResultSummary;
+  writtenItemResults: WrittenItemResult[];
   previewObservations: string[];
   aspects: ReportAspect[];
   demonstratedStrengths: string[];

@@ -19,7 +19,7 @@ export default function TermsPage() {
               The assessment is an educational self-reflection exercise. It is
               not clinical, diagnostic, validated, normed, or predictive, and it
               must not be used for admissions, employment, academic placement,
-              or decisions about a person's intelligence or general ability.
+              or decisions about a person&apos;s intelligence or general ability.
             </p>
           ),
         },
@@ -28,10 +28,11 @@ export default function TermsPage() {
           content: (
             <>
               <p>
-                When scoring is configured and succeeds, the assessment produces an
-                item-based result using the supplied 0–4 rubric. Unrated items are not
-                counted as zero. The result describes performance on this question set
-                under these conditions, not a fixed trait or general ability.
+                When scoring is configured and succeeds, the assessment reports
+                multiple-choice accuracy and a separate written-reasoning result. The
+                six written items use the supplied 0–4 rubric, for a maximum of 24 when
+                all are rated. The two results are not combined, and unrated items are
+                not counted as incorrect or as zero.
               </p>
               <p>
                 Five headings organize qualitative feedback across specified questions.
