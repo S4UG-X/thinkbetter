@@ -5,13 +5,13 @@ import {
   Check,
   CircleAlert,
   FileText,
-  Keyboard,
   Lightbulb,
   LockKeyhole,
   Play,
   RotateCcw,
   SearchCheck,
   ShieldCheck,
+  SkipForward,
   Target,
 } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -87,13 +87,10 @@ async function recordEvent(event: FunnelEvent) {
 function Brand({ href = "/" }: { href?: string }) {
   return (
     <a
-      className="inline-flex min-w-0 items-center gap-3 font-serif text-lg font-semibold text-ink outline-none focus-visible:ring-3 focus-visible:ring-accent/45"
+      className="inline-flex min-w-0 items-center font-serif text-lg font-semibold text-ink outline-none focus-visible:ring-3 focus-visible:ring-accent/45"
       href={href}
     >
       <span className="truncate">Critical Thinking Check</span>
-      <span className="hidden shrink-0 border border-accent/45 bg-accent-soft px-2 py-1 font-sans text-xs font-semibold uppercase text-accent sm:inline-flex">
-        Working title
-      </span>
     </a>
   );
 }
@@ -102,7 +99,7 @@ function SiteFooter() {
   return (
     <footer className="border-t border-ink/15 bg-paper-deep/50">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <p>Free MVP for educational reflection. Pricing for future features will be announced later.</p>
+        <p>A practical critical-thinking assessment for learning and reflection.</p>
         <nav aria-label="Legal" className="flex gap-5">
           <a className="underline decoration-ink/30 underline-offset-4 hover:text-accent" href="/privacy">
             Privacy
@@ -121,20 +118,42 @@ function Landing({ onStart }: { onStart: () => void }) {
     {
       icon: SearchCheck,
       label: "01",
-      title: "See how you reason",
-      copy: "Respond to realistic questions about claims, evidence, and uncertainty.",
+      title: "Answer practical questions",
+      copy: "Work through 10 multiple-choice and 6 written questions that become more challenging as you go.",
     },
     {
       icon: Target,
       label: "02",
-      title: "Find a useful next step",
-      copy: "Get feedback tied to your answers and the assessment rubric.",
+      title: "Get two clear results",
+      copy: "See your multiple-choice accuracy and a separate score for the reasoning in your written answers.",
     },
     {
       icon: BookOpenCheck,
       label: "03",
-      title: "Build the habit over time",
-      copy: "Browser prompts, guided practice, and progress measurement are planned, not part of this MVP.",
+      title: "Know what to practise",
+      copy: "Get focused feedback on assumptions, evidence, alternatives, competing explanations, and uncertainty.",
+    },
+  ];
+  const reportFeatures = [
+    {
+      icon: Check,
+      title: "MCQ accuracy",
+      copy: "See how many of the multiple-choice questions you answered correctly.",
+    },
+    {
+      icon: FileText,
+      title: "Written-reasoning score",
+      copy: "See a separate rubric-based result for the six questions that ask you to explain your thinking.",
+    },
+    {
+      icon: SearchCheck,
+      title: "Evidence from your answers",
+      copy: "Understand what your responses showed across five useful feedback areas.",
+    },
+    {
+      icon: Target,
+      title: "Practical next steps",
+      copy: "Leave with specific ways to strengthen how you examine claims and make decisions.",
     },
   ];
 
@@ -153,19 +172,18 @@ function Landing({ onStart }: { onStart: () => void }) {
 
       <section id="top" className="relative border-b border-ink/15">
         <div className="notebook-rule" aria-hidden="true" />
-        <div className="relative mx-auto grid min-h-[min(44rem,calc(100svh-8rem))] w-full max-w-6xl content-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(17rem,.6fr)] lg:py-16">
-          <div className="max-w-3xl">
+        <div className="relative mx-auto flex min-h-[min(38rem,calc(100svh-10rem))] w-full max-w-6xl items-center px-5 py-12 sm:px-8 lg:py-16">
+          <div className="max-w-4xl">
             <p className="mb-4 text-sm font-semibold uppercase text-accent">
-              A free critical-thinking self-assessment
+              Critical Thinking Check
             </p>
             <h1 className="balance font-serif text-5xl font-semibold leading-[1.04] text-ink sm:text-6xl lg:text-7xl">
-              Use AI without outsourcing your thinking.
+              Test your critical thinking.
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-ink-muted sm:text-xl">
-              Take a free, typed assessment to see how your answers handle
-              assumptions, evidence, alternative explanations, and uncertainty.
-              Get practical feedback on this set of responses and what you could
-              practise next.
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-ink-muted sm:text-xl">
+              Answer 16 questions about everyday claims, evidence, and uncertainty.
+              Get a clear report with your results, feedback on your answers, and
+              practical next steps.
             </p>
 
             <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-ink-muted">
@@ -174,12 +192,12 @@ function Landing({ onStart }: { onStart: () => void }) {
                 16 questions
               </span>
               <span className="inline-flex items-center gap-2">
-                <Keyboard aria-hidden="true" className="size-4 text-accent" />
-                Typed responses only
+                <SearchCheck aria-hidden="true" className="size-4 text-accent" />
+                Two clear results
               </span>
               <span className="inline-flex items-center gap-2">
-                <ShieldCheck aria-hidden="true" className="size-4 text-accent" />
-                Free MVP
+                <Target aria-hidden="true" className="size-4 text-accent" />
+                Personal feedback
               </span>
             </div>
 
@@ -189,23 +207,12 @@ function Landing({ onStart }: { onStart: () => void }) {
               onClick={onStart}
             >
               <Play aria-hidden="true" className="size-4 fill-current" />
-              Start the free test
+              Start the assessment
             </Button>
             <p className="mt-3 text-sm leading-6 text-ink-muted">
-              No account, email, or payment is required to begin.
+              No account or email is needed to start.
             </p>
           </div>
-
-          <aside className="border-l-2 border-accent pl-5 lg:self-end" aria-label="Assessment note">
-            <p className="annotation-label">A careful snapshot</p>
-            <p className="mt-4 font-serif text-2xl leading-8 text-ink">
-              The report reflects the reasoning shown in these responses, not a fixed measure of ability.
-            </p>
-            <p className="mt-3 leading-7 text-ink-muted">
-              Ordinary language is welcome. Spelling, grammar, dialect, confidence,
-              and answer length are not scored by themselves.
-            </p>
-          </aside>
         </div>
       </section>
 
@@ -213,7 +220,7 @@ function Landing({ onStart }: { onStart: () => void }) {
         <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 lg:py-18">
           <p className="annotation-label">What you get</p>
           <h2 className="mt-4 max-w-2xl font-serif text-4xl font-semibold text-ink sm:text-5xl">
-            Feedback that stays close to the evidence
+            A useful result, not just a final number
           </h2>
           <div className="mt-10 grid border-y border-ink/15 md:grid-cols-3">
             {benefits.map(({ icon: Icon, label, title, copy }, index) => (
@@ -234,49 +241,42 @@ function Landing({ onStart }: { onStart: () => void }) {
       </section>
 
       <section className="border-b border-ink/15">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-2 lg:py-18">
-          <div>
-            <p className="annotation-label">Available in this MVP</p>
-            <h2 className="mt-4 font-serif text-3xl font-semibold text-ink sm:text-4xl">
-              The assessment and its report
+        <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-8 lg:py-18">
+          <p className="annotation-label">Inside your report</p>
+          <div className="mt-4 grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
+            <h2 className="font-serif text-4xl font-semibold text-ink sm:text-5xl">
+              See what your answers show
             </h2>
-            <p className="mt-5 text-lg leading-8 text-ink-muted">
-              Complete the question set, see a short response-grounded preview,
-              then save an email address to open the full report in this browser.
-              The report is not emailed.
+            <p className="max-w-2xl text-lg leading-8 text-ink-muted">
+              After the assessment, you will see a short preview. Save your email
+              address to open the full report in this browser; the report is not emailed.
             </p>
           </div>
-          <div className="border-l-2 border-accent pl-6">
-            <p className="text-sm font-semibold uppercase text-accent">Planned for later</p>
-            <p className="mt-4 text-lg leading-8 text-ink-muted">
-              Browser-based prompts, guided practice, and progress measurement are
-              future capabilities. They are not active now. The MVP is free, and
-              pricing for future paid features will be announced later.
-            </p>
+          <div className="mt-10 grid border-y border-ink/15 sm:grid-cols-2">
+            {reportFeatures.map(({ icon: Icon, title, copy }, index) => (
+              <article
+                key={title}
+                className={`py-7 sm:px-6 ${index > 0 ? "border-t border-ink/15" : ""} ${index === 1 ? "sm:border-t-0" : ""} ${index % 2 === 1 ? "sm:border-l" : ""}`}
+              >
+                <Icon aria-hidden="true" className="size-5 text-accent" />
+                <h3 className="mt-4 font-serif text-2xl font-semibold text-ink">{title}</h3>
+                <p className="mt-2 leading-7 text-ink-muted">{copy}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="border-b border-ink/15 bg-paper-deep/35">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-12 sm:px-8 lg:grid-cols-2">
-          <div className="flex gap-4">
-            <ShieldCheck aria-hidden="true" className="mt-1 size-6 shrink-0 text-accent" />
-            <div>
-              <h2 className="font-serif text-2xl font-semibold text-ink">Purpose and privacy</h2>
-              <p className="mt-2 leading-7 text-ink-muted">
-                This is a learning and self-reflection tool, not a clinical,
-                intelligence, admissions, employment, or placement test. Answers
-                are used transiently to calculate the report and are not added to
-                analytics or the email record.
-              </p>
-            </div>
-          </div>
-          <div className="border-l-2 border-accent pl-5">
-            <p className="text-sm font-semibold uppercase text-accent">Owner review required</p>
+        <div className="mx-auto flex w-full max-w-6xl gap-4 px-5 py-12 sm:px-8">
+          <ShieldCheck aria-hidden="true" className="mt-1 size-6 shrink-0 text-accent" />
+          <div className="max-w-3xl">
+            <h2 className="font-serif text-2xl font-semibold text-ink">Purpose and privacy</h2>
             <p className="mt-2 leading-7 text-ink-muted">
-              Age eligibility and consent rules must be confirmed before public
-              launch. Until then, email collection is limited to people who confirm
-              they are at least 18.
+              This is a learning and self-reflection tool, not a clinical,
+              intelligence, admissions, employment, or placement test. Answers
+              are used to calculate the report and are not added to analytics or
+              the email record.
             </p>
           </div>
         </div>
@@ -296,6 +296,7 @@ function Assessment({
   onBack,
   onContinue,
   onKeepEditing,
+  onSkip,
 }: {
   answer: AssessmentAnswer;
   currentIndex: number;
@@ -305,6 +306,7 @@ function Assessment({
   onBack: () => void;
   onContinue: (force: boolean) => void;
   onKeepEditing: () => void;
+  onSkip: () => void;
 }) {
   const question = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -458,7 +460,7 @@ function Assessment({
             )}
           </div>
 
-          <div className="mt-4 flex flex-col-reverse gap-3 border-t border-ink/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-3 border-t border-ink/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <Button
               type="button"
               variant="outline"
@@ -468,19 +470,32 @@ function Assessment({
             >
               Back
             </Button>
-            <Button
-              type="submit"
-              className="min-h-11 rounded-[4px] bg-ink px-5 text-paper hover:bg-accent"
-            >
-              {isFinal ? (
-                <>
-                  <Check aria-hidden="true" />
-                  Finish assessment
-                </>
-              ) : (
-                "Continue"
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {currentIndex >= 2 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onSkip}
+                  className="min-h-11 rounded-[4px] border-ink/30 bg-transparent px-4 text-ink hover:bg-paper-deep"
+                >
+                  <SkipForward aria-hidden="true" />
+                  {isFinal ? "Skip and finish" : "Skip question"}
+                </Button>
               )}
-            </Button>
+              <Button
+                type="submit"
+                className="min-h-11 rounded-[4px] bg-ink px-5 text-paper hover:bg-accent"
+              >
+                {isFinal ? (
+                  <>
+                    <Check aria-hidden="true" />
+                    Finish assessment
+                  </>
+                ) : (
+                  "Continue"
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </div>
@@ -556,7 +571,7 @@ function ScoringScreen({
 
 function ReportAccessForm({ onUnlocked }: { onUnlocked: () => void }) {
   const [email, setEmail] = useState("");
-  const [betaConsent, setBetaConsent] = useState(false);
+  const [productUpdatesConsent, setProductUpdatesConsent] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -577,7 +592,11 @@ function ReportAccessForm({ onUnlocked }: { onUnlocked: () => void }) {
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, betaConsent, ageConfirmed }),
+        body: JSON.stringify({
+          email,
+          betaConsent: productUpdatesConsent,
+          ageConfirmed,
+        }),
       });
       const payload = (await response.json().catch(() => null)) as { message?: string } | null;
 
@@ -617,13 +636,13 @@ function ReportAccessForm({ onUnlocked }: { onUnlocked: () => void }) {
 
       <div className="flex items-start gap-3">
         <Checkbox
-          id="beta-consent"
-          checked={betaConsent}
-          onCheckedChange={(value) => setBetaConsent(value === true)}
+          id="product-updates-consent"
+          checked={productUpdatesConsent}
+          onCheckedChange={(value) => setProductUpdatesConsent(value === true)}
           className="mt-1 border-ink/50 data-[state=checked]:border-accent data-[state=checked]:bg-accent"
         />
-        <Label htmlFor="beta-consent" className="block text-sm font-normal leading-6 text-ink-muted">
-          Email me when the beta is ready. No marketing emails.
+        <Label htmlFor="product-updates-consent" className="block text-sm font-normal leading-6 text-ink-muted">
+          Email me about product updates. No marketing emails.
           <span className="block text-xs">Optional and not required to view the report.</span>
         </Label>
       </div>
@@ -720,8 +739,8 @@ function ReportPreview({
               are not validated numeric subscales.
             </p>
             <p className="mt-4 text-sm leading-6 text-ink-muted">
-              This MVP is free. No payment or card details are requested. Pricing for
-              future features will be announced later.
+              The assessment and full report are free. No payment or card details
+              are requested.
             </p>
           </div>
           <ReportAccessForm onUnlocked={onUnlocked} />
@@ -912,8 +931,8 @@ function FullReport({ report, onRestart }: { report: AssessmentReport; onRestart
           <div className="border-l-2 border-accent pl-5">
             <p className="text-sm font-semibold uppercase text-accent">Keep the result in scope</p>
             <p className="mt-3 leading-7 text-ink-muted">
-              This report does not prove improvement over time. Comparable repeat
-              assessments and progress tracking are future capabilities, not part of this MVP.
+              This report covers one assessment session. It does not prove change
+              over time or compare you with other test takers.
             </p>
           </div>
         </div>
@@ -1025,7 +1044,9 @@ export function AssessmentExperience() {
     return () => lifecycle.abort();
   }, []);
 
-  async function calculateReport() {
+  async function calculateReport(
+    submittedAnswers: Record<QuestionId, AssessmentAnswer> = answers,
+  ) {
     setView("scoring");
     setScoringStatus("loading");
     setScoringMessage("");
@@ -1040,7 +1061,10 @@ export function AssessmentExperience() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          answers: questionIds.map((questionId) => ({ questionId, ...answers[questionId] })),
+          answers: questionIds.map((questionId) => ({
+            questionId,
+            ...submittedAnswers[questionId],
+          })),
         }),
       });
       const payload = (await response.json().catch(() => null)) as {
@@ -1075,6 +1099,23 @@ export function AssessmentExperience() {
     if (currentIndex === 0) return;
     setConfirmIncomplete(false);
     setCurrentIndex((index) => index - 1);
+  }
+
+  function handleSkip() {
+    const questionId = questions[currentIndex].id;
+    const nextAnswers = {
+      ...answers,
+      [questionId]: { choice: null, explanation: "" },
+    };
+
+    setAnswers(nextAnswers);
+    setConfirmIncomplete(false);
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((index) => index + 1);
+      return;
+    }
+
+    void calculateReport(nextAnswers);
   }
 
   function handleContinue(force: boolean) {
@@ -1113,6 +1154,7 @@ export function AssessmentExperience() {
         onBack={handleBack}
         onContinue={handleContinue}
         onKeepEditing={() => setConfirmIncomplete(false)}
+        onSkip={handleSkip}
       />
     );
   }

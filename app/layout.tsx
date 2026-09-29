@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Critical Thinking Check",
   description:
-    "A free, typed 16-question assessment with response-grounded feedback on assumptions, evidence, alternatives, and uncertainty.",
+    "A 16-question critical-thinking assessment with separate results, personal feedback, and practical next steps.",
   robots: {
     index: false,
     follow: false,

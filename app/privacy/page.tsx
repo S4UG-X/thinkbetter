@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Draft Privacy Notice | Critical Thinking Check",
+  title: "Privacy Notice | Critical Thinking Check",
 };
 
 export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy notice"
-      intro="This notice explains how the pre-launch assessment, report, email access, and optional beta notification handle information."
+      intro="This notice explains how the assessment, report, email access, and optional product updates handle information."
       sections={[
         {
           title: "Taking the assessment",
@@ -38,22 +38,22 @@ export default function PrivacyPage() {
           ),
         },
         {
-          title: "Email access and optional beta updates",
+          title: "Email access and optional product updates",
           content: (
             <>
               <p>
                 Completing the assessment and viewing the report preview do not require
                 an email. An email address is required to open the full report in the
                 current browser session. Saving it stores the normalized email address,
-                report-request status, beta-notification consent, and signup timestamp
+                report-request status, product-update consent, and signup timestamp
                 in a table separate from assessment answers.
               </p>
               <p>
-                Beta-notification consent is separate, optional, and unchecked by
+                Product-update consent is separate, optional, and unchecked by
                 default. The adult-age confirmation is checked before email collection
-                but is not stored. The MVP does not email the report or send a
+                but is not stored. The service does not email the report or send a
                 confirmation message. No marketing email is authorized unless the
-                separate beta checkbox is selected.
+                separate product-update checkbox is selected.
               </p>
             </>
           ),
@@ -98,29 +98,20 @@ export default function PrivacyPage() {
           title: "Payments, audio, and accounts",
           content: (
             <p>
-              This MVP has no payment collection, card form, checkout, microphone
+              The service has no payment collection, card form, checkout, microphone
               permission, voice recording, audio upload, transcription, password
-              login, or application account system. During private owner review,
-              the hosting platform may require its own access authentication; the
-              assessment does not store that identity.
+              login, or application account system. The hosting platform may require
+              its own access authentication; the assessment does not store that identity.
             </p>
           ),
         },
         {
-          title: "Age and contact details",
+          title: "Age policy",
           content: (
-            <>
-              <p>
-                Age eligibility and consent rules are not final. Email collection is
-                temporarily limited to people who confirm they are at least 18.
-                People under 18 should not submit an email address.
-              </p>
-              <p>
-                Owner contact and privacy-request instructions must be added here
-                before public launch. No contact address has been invented for
-                this draft.
-              </p>
-            </>
+            <p>
+              Email collection is limited to people who confirm they are at least 18.
+              People under 18 should not submit an email address.
+            </p>
           ),
         },
       ]}

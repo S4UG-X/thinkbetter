@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Draft Terms | Critical Thinking Check",
+  title: "Terms | Critical Thinking Check",
 };
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of use"
-      intro="These draft terms describe the limited educational purpose and current capabilities of the pre-launch MVP."
+      intro="These terms describe the educational purpose and current features of Critical Thinking Check."
       sections={[
         {
           title: "Educational purpose only",
@@ -38,18 +38,17 @@ export default function TermsPage() {
                 Five headings organize qualitative feedback across specified questions.
                 They are a reporting crosswalk, not validated numeric subscales, and
                 have no weights, thresholds, rankings, or pass/fail labels. Automated
-                evaluation can make mistakes and should be reviewed during the pilot.
+                evaluation can make mistakes and should be interpreted with care.
               </p>
             </>
           ),
         },
         {
-          title: "Free MVP and future pricing",
+          title: "Access and payment",
           content: (
             <p>
-              The current MVP and its report are free. No payment is taken, no card
-              data is collected, and there is no checkout. Pricing for possible future
-              features will be announced later.
+              The assessment and its report are free. No payment is taken, no card
+              data is collected, and there is no checkout.
             </p>
           ),
         },
@@ -59,7 +58,7 @@ export default function TermsPage() {
             <p>
               No email is needed to take the assessment or view the report preview.
               Saving an email is required to open the full report in the browser, but
-              does not cause the report to be emailed. The separate beta-notification
+              does not cause the report to be emailed. The separate product-update
               checkbox is optional and does not authorize other marketing.
             </p>
           ),
@@ -68,10 +67,8 @@ export default function TermsPage() {
           title: "Age policy",
           content: (
             <p>
-              The owner has not finalized eligibility or parental-consent rules
-              for people under 18. Until that decision is made, email collection is
-              limited to people who confirm they are at least 18. This draft does
-              not state that under-18 users are eligible.
+              Email collection is limited to people who confirm they are at least 18.
+              People under 18 should not submit an email address.
             </p>
           ),
         },
@@ -79,21 +76,9 @@ export default function TermsPage() {
           title: "Availability and changes",
           content: (
             <p>
-              This is an early MVP and features may be unavailable, revised, or
-              removed. Scoring requires a configured server-side evaluator and may be
-              temporarily unavailable. Payment, outbound report email, accounts, voice
-              features, browser interventions, and longitudinal tracking are not part
-              of the implemented product.
-            </p>
-          ),
-        },
-        {
-          title: "Owner details",
-          content: (
-            <p>
-              The legal owner name, jurisdiction, governing terms, contact details,
-              and dispute provisions must be supplied and reviewed before public
-              launch. This draft intentionally does not invent them.
+              Features may be revised or temporarily unavailable. Scoring requires a
+              configured server-side evaluator. The service does not provide payment,
+              outbound report email, accounts, voice features, or progress tracking.
             </p>
           ),
         },
