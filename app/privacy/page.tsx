@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Privacy Notice | Critical Thinking Check",
+  title: "Privacy Notice | thinkbetter",
 };
 
 export default function PrivacyPage() {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Critical Thinking Check",
+  title: "thinkbetter",
   description:
     "A 16-question critical-thinking assessment with separate results, personal feedback, and practical next steps.",
   robots: {

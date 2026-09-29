@@ -20,7 +20,7 @@ export function LegalPage({
       <header className="border-b border-ink/15 bg-paper/95">
         <div className="mx-auto flex min-h-16 w-full max-w-5xl items-center justify-between gap-5 px-5 py-3 sm:px-8">
           <Link className="font-serif text-lg font-semibold text-ink" href="/">
-            Critical Thinking Check
+            thinkbetter
           </Link>
           <Link className="text-sm text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-accent" href="/">
             Back to assessment

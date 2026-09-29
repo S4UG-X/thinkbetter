@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Terms | Critical Thinking Check",
+  title: "Terms | thinkbetter",
 };
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of use"
-      intro="These terms describe the educational purpose and current features of Critical Thinking Check."
+      intro="These terms describe the educational purpose and current features of thinkbetter."
       sections={[
         {
           title: "Educational purpose only",

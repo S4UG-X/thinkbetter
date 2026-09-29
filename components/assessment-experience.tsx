@@ -90,7 +90,7 @@ function Brand({ href = "/" }: { href?: string }) {
       className="inline-flex min-w-0 items-center font-serif text-lg font-semibold text-ink outline-none focus-visible:ring-3 focus-visible:ring-accent/45"
       href={href}
     >
-      <span className="truncate">Critical Thinking Check</span>
+      <span className="truncate">thinkbetter</span>
     </a>
   );
 }
@@ -119,7 +119,7 @@ function Landing({ onStart }: { onStart: () => void }) {
       icon: SearchCheck,
       label: "01",
       title: "Answer practical questions",
-      copy: "Work through 10 multiple-choice and 6 written questions that become more challenging as you go.",
+      copy: "Work through 10 multiple-choice and 6 written questions about claims, evidence, and decisions.",
     },
     {
       icon: Target,
@@ -175,7 +175,7 @@ function Landing({ onStart }: { onStart: () => void }) {
         <div className="relative mx-auto flex min-h-[min(38rem,calc(100svh-10rem))] w-full max-w-6xl items-center px-5 py-12 sm:px-8 lg:py-16">
           <div className="max-w-4xl">
             <p className="mb-4 text-sm font-semibold uppercase text-accent">
-              Critical Thinking Check
+              thinkbetter
             </p>
             <h1 className="balance font-serif text-5xl font-semibold leading-[1.04] text-ink sm:text-6xl lg:text-7xl">
               Test your critical thinking.
@@ -346,10 +346,7 @@ function Assessment({
             onContinue(false);
           }}
         >
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <p className="annotation-label">{question.id}</p>
-            <p className="text-sm text-ink-muted">{question.difficulty}</p>
-          </div>
+          <p className="annotation-label">{question.id}</p>
           <h1
             ref={headingRef}
             tabIndex={-1}

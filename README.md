@@ -1,4 +1,4 @@
-# Critical Thinking Check
+# thinkbetter
 
 This Site is a free, typed 16-question critical-thinking assessment. It keeps
 answers in the active browser session, sends them only to the server-side
