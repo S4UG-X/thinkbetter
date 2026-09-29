@@ -3,38 +3,44 @@
 @import "../vendor/shadcn-tailwind-4.13.0.css";
 
 :root {
-  --background: #f4f0e7;
-  --foreground: #202521;
-  --card: #fbf8f1;
-  --card-foreground: #202521;
-  --popover: #fbf8f1;
-  --popover-foreground: #202521;
-  --primary: #202521;
-  --primary-foreground: #f9f5ec;
-  --secondary: #e8e2d6;
-  --secondary-foreground: #202521;
-  --muted: #e8e2d6;
-  --muted-foreground: #60655f;
-  --accent: #a84438;
-  --accent-foreground: #fffaf2;
-  --destructive: #9f2f2f;
-  --border: #c8c0b3;
-  --input: #aaa194;
-  --ring: #a84438;
-  --chart-1: #a84438;
-  --chart-2: #365b54;
-  --chart-3: #6a5d91;
-  --chart-4: #a47b2e;
-  --chart-5: #3e6480;
+  --background: #f7f9fc;
+  --foreground: #071946;
+  --card: #ffffff;
+  --card-foreground: #071946;
+  --popover: #ffffff;
+  --popover-foreground: #071946;
+  --primary: #082762;
+  --primary-foreground: #f8fbff;
+  --secondary: #dce7f4;
+  --secondary-foreground: #071946;
+  --muted: #edf3fa;
+  --muted-foreground: #4f6387;
+  --accent: #0c4aa1;
+  --accent-foreground: #ffffff;
+  --destructive: #a73135;
+  --border: #d8e2ef;
+  --input: #b9c8dc;
+  --ring: #0c4aa1;
+  --chart-1: #0c4aa1;
+  --chart-2: #d3a34a;
+  --chart-3: #0f7a4a;
+  --chart-4: #6f79b7;
+  --chart-5: #b36b3c;
+  --gold: #d3a34a;
+  --gold-soft: #fff3d9;
+  --gold-ink: #845d08;
+  --blue-soft: #e8f2ff;
+  --green-soft: #e7f6ed;
+  --green-ink: #127245;
   --radius: 0.375rem;
-  --sidebar: #eee9de;
-  --sidebar-foreground: #202521;
-  --sidebar-primary: #202521;
-  --sidebar-primary-foreground: #f9f5ec;
-  --sidebar-accent: #ead8d2;
-  --sidebar-accent-foreground: #742c25;
-  --sidebar-border: #c8c0b3;
-  --sidebar-ring: #a84438;
+  --sidebar: #f1f6fb;
+  --sidebar-foreground: #071946;
+  --sidebar-primary: #082762;
+  --sidebar-primary-foreground: #f8fbff;
+  --sidebar-accent: #e8f2ff;
+  --sidebar-accent-foreground: #0c4aa1;
+  --sidebar-border: #d8e2ef;
+  --sidebar-ring: #0c4aa1;
 }
 
 @theme inline {
@@ -61,6 +67,12 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-ink: var(--gold-ink);
+  --color-blue-soft: var(--blue-soft);
+  --color-green-soft: var(--green-soft);
+  --color-green-ink: var(--green-ink);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -85,37 +97,6 @@
     "Liberation Mono", "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #181915;
-    --foreground: #f1ede4;
-    --card: #23241f;
-    --card-foreground: #f1ede4;
-    --popover: #23241f;
-    --popover-foreground: #f1ede4;
-    --primary: #f1ede4;
-    --primary-foreground: #181915;
-    --secondary: #30312b;
-    --secondary-foreground: #f1ede4;
-    --muted: #30312b;
-    --muted-foreground: #bab7ae;
-    --accent: #dc7568;
-    --accent-foreground: #181915;
-    --destructive: #ee7777;
-    --border: #4a4b43;
-    --input: #686960;
-    --ring: #dc7568;
-    --sidebar: #20211d;
-    --sidebar-foreground: #f1ede4;
-    --sidebar-primary: #f1ede4;
-    --sidebar-primary-foreground: #181915;
-    --sidebar-accent: #4a2e2b;
-    --sidebar-accent-foreground: #f4d7d2;
-    --sidebar-border: #4a4b43;
-    --sidebar-ring: #dc7568;
-  }
-}
-
 * {
   box-sizing: border-box;
 }
@@ -126,7 +107,9 @@ html {
 
 body {
   min-width: 320px;
-  background: var(--background);
+  background:
+    linear-gradient(180deg, #ffffff 0%, var(--background) 28rem),
+    var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   letter-spacing: 0;
@@ -144,49 +127,23 @@ a {
 }
 
 ::selection {
-  background: #dcb3aa;
-  color: #202521;
+  background: #cfe2ff;
+  color: #071946;
 }
 
 .balance {
   text-wrap: balance;
 }
 
-.notebook-rule {
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(
-    to bottom,
-    transparent 31px,
-    color-mix(in srgb, var(--border) 38%, transparent) 32px
-  );
-  background-size: 100% 32px;
-  mask-image: linear-gradient(to right, transparent, black 18%, black 82%, transparent);
-  pointer-events: none;
-}
-
-.evidence-sheet {
-  border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
-  background: color-mix(in srgb, var(--card) 96%, transparent);
-  padding: 1.5rem;
-  box-shadow: 6px 6px 0 color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-.evidence-item {
-  border: 1px solid color-mix(in srgb, var(--foreground) 18%, transparent);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--card) 94%, transparent);
-  padding: 1rem;
-}
-
-.annotation-label {
+.annotation-label,
+.eyebrow {
   display: inline-flex;
-  border-bottom: 2px solid var(--accent);
-  padding-bottom: 0.2rem;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--accent);
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
